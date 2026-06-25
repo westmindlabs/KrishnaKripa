@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>KRISHNA KRIPA</title>
+  <meta name="description" content="Aurum Palace – where every stay becomes a legend. Experience unrivalled luxury, world-class dining, and bespoke concierge." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* reset & base */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --gold-dark: #8B6914;
+      --champagne: #F5E6C8;
+      --midnight: #0A0A0F;
+      --midnight2: #11111A;
+      --midnight3: #1A1A28;
+      --pearl: #F8F4EE;
+      --pearl2: #EDE5D8;
+      --emerald: #1A4A3A;
+      --text-light: #E8E0D0;
+      --text-muted: #9B9080;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Jost', system-ui, sans-serif;
+      --gradient-start: #784300;
+      --gradient-end: #ca8a14;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--midnight);
+      color: var(--text-light);
+      font-family: var(--sans);
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: default;
+    }
+    a, button { cursor: pointer; }
+
+    /* gradient text utility */
+    .gradient-text {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* custom cursor — hidden on touch devices */
+    #cursor, #cursor-ring {
+      display: none;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      #cursor, #cursor-ring {
+        display: block;
+      }
+    }
+
+    #cursor { position: fixed; width: 12px; height: 12px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 99999; transform: translate(-50%, -50%); transition: width .3s, height .3s; mix-blend-mode: difference; }
+    #cursor-ring { position: fixed; width: 40px; height: 40px; border: 1px solid rgba(201,168,76,.4); border-radius: 50%; pointer-events: none; z-index: 99998; transform: translate(-50%, -50%); transition: transform .15s ease, width .3s, height .3s; }
+
+    /* loading screen — perfectly centred */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: var(--midnight);
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      transition: opacity 0.6s, visibility 0.6s;
+      text-align: center;
+      padding: 1.5rem;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loader-logo {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 10vw, 3.5rem);
+      letter-spacing: 0.2em;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: pulse 2s ease infinite;
+      line-height: 1.2;
+      width: 100%;
+      max-width: 600px;
+    }
+    .loader-bar-wrap {
+      width: min(80%, 280px);
+      height: 2px;
+      background: rgba(201,168,76,.2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    .loader-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+      transition: width .3s ease;
+    }
+    .loader-text {
+      font-size: clamp(0.5rem, 2.5vw, 0.7rem);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* nav */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9000;
+      padding: 1.2rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all .6s cubic-bezier(.4,0,.2,1);
+      background: rgba(10,10,15,.6);
+      backdrop-filter: blur(6px);
+    }
+    nav.scrolled { background: rgba(10,10,15,.92); backdrop-filter: blur(20px); padding: 0.8rem 1.5rem; border-bottom: 1px solid rgba(201,168,76,.15); }
+    .nav-logo { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; letter-spacing: .1em; color: var(--gold); text-decoration: none; display: flex; align-items: center; gap: .5rem; white-space: nowrap; }
+    .nav-logo-mark { width: 28px; height: 28px; border: 1.5px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .6rem; flex-shrink: 0; }
+    .nav-links { display: none; gap: 1.8rem; list-style: none; align-items: center; }
+    .nav-links a { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text-light); text-decoration: none; transition: color .3s; position: relative; white-space: nowrap; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); transform: scaleX(0); transition: transform .3s; }
+    .nav-links a:hover { color: var(--gold-light); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-cta { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); border: none; color: #fff; padding: .45rem 1.2rem; font-size: .6rem; letter-spacing: .15em; text-transform: uppercase; transition: all .4s; text-decoration: none; border-radius: 4px; white-space: nowrap; }
+    .nav-cta:hover { opacity: .85; transform: translateY(-1px); }
+    .nav-hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .nav-hamburger span { width: 24px; height: 1.5px; background: var(--text-light); display: block; transition: all .3s; }
+
+    /* hero */
+    #hero { position: relative; height: 100vh; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .hero-carousel { position: absolute; inset: 0; }
+    .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.5s ease; background-size: cover; background-position: center; transform: scale(1.05); transition: opacity 1.5s ease, transform 8s ease; }
+    .hero-slide.active { opacity: 1; transform: scale(1); }
+    .hero-slide:nth-child(1) { background-image: linear-gradient(135deg,rgba(10,10,15,.7),rgba(201,168,76,.05)), url('https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&q=80'); }
+    .hero-slide:nth-child(2) { background-image: linear-gradient(135deg,rgba(10,10,15,.65),rgba(26,74,58,.15)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80'); }
+    .hero-slide:nth-child(3) { background-image: linear-gradient(135deg,rgba(10,10,15,.6),rgba(201,168,76,.08)), url('https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&q=80'); }
+    .hero-slide:nth-child(4) { background-image: linear-gradient(135deg,rgba(10,10,15,.7),rgba(10,10,15,.3)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1200&q=80'); }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom,rgba(10,10,15,.1),rgba(10,10,15,.3),rgba(10,10,15,.85)); z-index: 2; }
+    .hero-particles { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+    .hero-content { position: relative; z-index: 4; text-align: center; max-width: 900px; padding: 0 1.5rem; }
+    .hero-eyebrow { font-size: .6rem; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; opacity: 0; animation: fadeUp .8s ease .3s forwards; }
+    .hero-title { font-family: var(--serif); font-size: clamp(2.8rem, 10vw, 6rem); font-weight: 300; line-height: 1.05; margin-bottom: 1rem; opacity: 0; animation: fadeUp 1s ease .5s forwards; }
+    .hero-title em { font-style: italic; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-subtitle { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2rem; opacity: 0; animation: fadeUp .8s ease .8s forwards; }
+    .hero-divider { width: 60px; height: 2px; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); margin: 0 auto 1.8rem; opacity: 0; animation: fadeUp .8s ease .7s forwards; }
+    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; opacity: 0; animation: fadeUp .8s ease 1s forwards; }
+    .btn-primary { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: #fff; padding: .75rem 1.8rem; font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; border: none; transition: all .4s; font-family: var(--sans); text-decoration: none; display: inline-block; border-radius: 4px; }
+    .btn-primary:hover { opacity: .88; transform: translateY(-2px); }
+    .btn-outline { background: transparent; color: var(--pearl); padding: .75rem 1.8rem; font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; border: 1px solid rgba(248,244,238,.3); transition: all .4s; font-family: var(--sans); text-decoration: none; display: inline-block; border-radius: 4px; }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+    .hero-scroll { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 4; display: flex; flex-direction: column; align-items: center; gap: .5rem; opacity: 0; animation: fadeUp .8s ease 1.4s forwards; }
+    .hero-scroll span { font-size: .5rem; letter-spacing: .25em; text-transform: uppercase; color: var(--text-muted); }
+    .hero-scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom,transparent,var(--gold)); animation: scrollLine 2s ease infinite; }
+    .hero-dots { position: absolute; bottom: 2rem; right: 1.5rem; z-index: 4; display: flex; gap: .4rem; }
+    .hero-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(201,168,76,.3); border: 1px solid rgba(201,168,76,.5); cursor: pointer; transition: all .3s; }
+    .hero-dot.active { background: var(--gold); width: 20px; border-radius: 3px; }
+
+    /* sections */
+    section { position: relative; }
+    .section-eyebrow { font-size: .55rem; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.8rem; }
+    .section-eyebrow::before { content: ''; width: 24px; height: 2px; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); flex-shrink: 0; }
+    .section-title { font-family: var(--serif); font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 300; line-height: 1.1; margin-bottom: 1.2rem; }
+    .section-title em { font-style: italic; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .section-body { font-size: .85rem; line-height: 1.8; color: var(--text-muted); max-width: 520px; }
+    .gold-line { width: 40px; height: 2px; background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); margin: 1.2rem 0; }
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .8s ease, transform .8s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* about */
+    #about { padding: 6rem 1.5rem; background: var(--midnight2); }
+    .about-grid { display: grid; grid-template-columns: 1fr; gap: 3rem; align-items: center; max-width: 1300px; margin: 0 auto; }
+    .about-image-stack { position: relative; height: auto; min-height: 400px; display: flex; flex-direction: column; gap: 1rem; }
+    .about-img-main { width: 100%; height: auto; object-fit: cover; opacity: 0; transition: opacity .8s; border-radius: 8px; }
+    .about-img-main.loaded { opacity: 1; }
+    .about-img-secondary { width: 70%; height: auto; object-fit: cover; border: 3px solid var(--midnight2); opacity: 0; transition: opacity .8s .2s; border-radius: 8px; margin-left: auto; margin-top: -3rem; }
+    .about-img-secondary.loaded { opacity: 1; }
+    .about-badge { background: var(--midnight3); border: 1px solid rgba(201,168,76,.3); padding: 1rem 1.5rem; backdrop-filter: blur(10px); z-index: 2; border-radius: 8px; display: inline-block; margin-top: 1rem; }
+    .about-badge-num { font-family: var(--serif); font-size: 2rem; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 300; }
+    .about-badge-label { font-size: .55rem; letter-spacing: .15em; text-transform: uppercase; color: var(--text-muted); }
+    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2rem; }
+    .stat-item { text-align: center; padding: 1rem; border: 1px solid rgba(201,168,76,.1); transition: border-color .4s; border-radius: 8px; }
+    .stat-item:hover { border-color: rgba(201,168,76,.4); }
+    .stat-num { font-family: var(--serif); font-size: 2rem; font-weight: 300; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { font-size: .55rem; letter-spacing: .15em; text-transform: uppercase; color: var(--text-muted); margin-top: .3rem; }
+
+    /* rooms */
+    #rooms { padding: 6rem 1.5rem; background: var(--midnight); }
+    .rooms-header { max-width: 1300px; margin: 0 auto 3rem; display: flex; flex-direction: column; gap: 1.5rem; align-items: flex-start; }
+    .rooms-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 1300px; margin: 0 auto; }
+    .room-card { position: relative; overflow: hidden; cursor: pointer; border-radius: 8px; background: var(--midnight2); }
+    .room-img { width: 100%; height: 350px; object-fit: cover; transition: transform .8s cubic-bezier(.4,0,.2,1), filter .5s; }
+    .room-card:hover .room-img { transform: scale(1.05); filter: brightness(.7); }
+    .room-overlay { position: absolute; inset: 0; background: linear-gradient(to top,rgba(10,10,15,.95),rgba(10,10,15,.1) 60%,transparent); transition: background .5s; }
+    .room-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 1.5rem; transition: transform .5s; }
+    .room-cat { font-size: .5rem; letter-spacing: .25em; text-transform: uppercase; color: var(--gold); margin-bottom: .4rem; }
+    .room-name { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; margin-bottom: .3rem; }
+    .room-desc { font-size: .7rem; line-height: 1.6; color: var(--text-muted); opacity: 0; transform: translateY(10px); transition: all .5s .1s; max-height: 0; overflow: hidden; }
+    .room-card:hover .room-desc { opacity: 1; transform: translateY(0); max-height: 80px; }
+    .room-price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(201,168,76,.2); flex-wrap: wrap; gap: 0.5rem; }
+    .room-price { font-family: var(--serif); font-size: 1.1rem; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .room-price-label { font-size: .5rem; letter-spacing: .15em; text-transform: uppercase; color: var(--text-muted); }
+    .room-btn { opacity: 0; transform: translateY(5px); transition: all .4s .2s; font-size: .55rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); text-decoration: none; display: flex; align-items: center; gap: .4rem; }
+    .room-card:hover .room-btn { opacity: 1; transform: translateY(0); }
+    .room-btn::after { content: '→'; transition: transform .3s; }
+    .room-card:hover .room-btn:hover::after { transform: translateX(4px); }
+    .room-featured .room-img { height: 350px; }
+
+    /* video section */
+    #video-section { padding: 6rem 1.5rem; background: var(--midnight2); }
+    .video-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 1300px; margin: 2rem auto 0; }
+    .video-card { position: relative; overflow: hidden; border-radius: 12px; aspect-ratio: 9 / 16; background: #000; box-shadow: 0 20px 40px rgba(0,0,0,0.6); transition: transform 0.4s ease, box-shadow 0.4s ease; max-width: 400px; margin: 0 auto; width: 100%; }
+    .video-card:hover { transform: scale(1.02); box-shadow: 0 30px 60px rgba(201,168,76,0.15); }
+    .video-card video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .video-card .video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: var(--pearl); }
+    .video-card .video-overlay span { font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+
+    /* facilities */
+    #facilities { padding: 6rem 1.5rem; background: var(--midnight); }
+    .facilities-inner { max-width: 1300px; margin: 0 auto; }
+    .facilities-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-top: 3rem; }
+    .facility-card { padding: 2rem 1.5rem; border: 1px solid rgba(201,168,76,.1); transition: all .4s; border-radius: 8px; }
+    .facility-card:hover { border-color: rgba(201,168,76,.4); background: rgba(201,168,76,.03); }
+    .facility-icon { font-size: 1.8rem; margin-bottom: 1rem; display: block; transition: transform .4s; }
+    .facility-card:hover .facility-icon { transform: translateY(-4px); }
+    .facility-name { font-family: var(--serif); font-size: 1.1rem; font-weight: 400; margin-bottom: .5rem; }
+    .facility-desc { font-size: .75rem; line-height: 1.7; color: var(--text-muted); }
+    .facility-tag { display: inline-block; margin-top: 0.8rem; font-size: .5rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(201,168,76,.3); padding: .2rem .7rem; border-radius: 20px; }
+
+    /* gallery */
+    #gallery { padding: 6rem 0; background: var(--midnight2); overflow: hidden; }
+    .gallery-header { padding: 0 1.5rem; max-width: 1300px; margin: 0 auto 2.5rem; }
+    .gallery-masonry { columns: 2; gap: 4px; padding: 0 4px; }
+    .gallery-item { break-inside: avoid; margin-bottom: 4px; overflow: hidden; cursor: pointer; position: relative; display: block; border-radius: 6px; }
+    .gallery-item img { width: 100%; display: block; transition: transform .6s ease, filter .4s; filter: grayscale(15%) brightness(.9); }
+    .gallery-item:hover img { transform: scale(1.05); filter: grayscale(0) brightness(1); }
+    .gallery-item-overlay { position: absolute; inset: 0; background: rgba(10,10,15,0); transition: background .4s; display: flex; align-items: center; justify-content: center; }
+    .gallery-item:hover .gallery-item-overlay { background: rgba(10,10,15,.35); }
+    .gallery-item-icon { opacity: 0; transition: opacity .4s; font-size: 1.5rem; color: var(--gold); }
+    .gallery-item:hover .gallery-item-icon { opacity: 1; }
+    #lightbox { position: fixed; inset: 0; background: rgba(10,10,15,.97); z-index: 99000; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
+    #lightbox.open { display: flex; }
+    #lightbox img { max-width: 95vw; max-height: 85vh; object-fit: contain; border-radius: 8px; }
+    #lightbox-close { position: absolute; top: 1rem; right: 1.5rem; font-size: 2rem; color: var(--text-muted); cursor: pointer; background: none; border: none; }
+
+    /* testimonials */
+    #testimonials { padding: 6rem 0; background: var(--midnight); overflow: hidden; }
+    .testimonials-header { padding: 0 1.5rem; max-width: 1300px; margin: 0 auto 3rem; }
+    .testimonials-track-wrap { overflow: hidden; padding: 0.5rem 0; }
+    .testimonials-track { display: flex; gap: 1.5rem; animation: tScroll 40s linear infinite; width: max-content; }
+    .testimonials-track:hover { animation-play-state: paused; }
+    .review-card { width: 300px; flex-shrink: 0; background: var(--midnight2); border: 1px solid rgba(201,168,76,.1); padding: 1.8rem; position: relative; transition: border-color .4s; border-radius: 12px; }
+    .review-card:hover { border-color: rgba(201,168,76,.3); }
+    .review-card::before { content: '\201C'; font-family: var(--serif); font-size: 4rem; line-height: 1; color: var(--gold); opacity: .1; position: absolute; top: -.2rem; left: 1rem; }
+    .review-stars span { color: var(--gold); font-size: .7rem; }
+    .review-text { font-family: var(--serif); font-size: .95rem; font-weight: 300; font-style: italic; line-height: 1.6; color: var(--text-light); margin-bottom: 1rem; }
+    .review-author { display: flex; align-items: center; gap: 0.8rem; padding-top: 1rem; border-top: 1px solid rgba(201,168,76,.1); }
+    .review-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--midnight3); border: 1px solid rgba(201,168,76,.3); display: flex; align-items: center; justify-content: center; font-family: var(--serif); color: var(--gold); flex-shrink: 0; font-size: .8rem; }
+    .review-name { font-size: .75rem; font-weight: 500; color: var(--pearl); }
+    .review-from { font-size: .6rem; letter-spacing: .05em; color: var(--text-muted); }
+
+    /* contact */
+    #contact { padding: 6rem 1.5rem; background: var(--midnight); position: relative; }
+    #contact::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 20%, rgba(120,67,0,0.15), transparent 70%),
+                  radial-gradient(ellipse at 70% 80%, rgba(202,138,20,0.08), transparent 60%);
+      pointer-events: none;
+    }
+    .contact-inner { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 3rem; align-items: start; position: relative; z-index: 1; }
+    .contact-info-grid { display: grid; gap: 1rem; margin-top: 2rem; }
+    .contact-card { display: flex; gap: 1rem; align-items: flex-start; padding: 1.2rem; border: 1px solid rgba(201,168,76,.12); transition: all .4s; text-decoration: none; color: inherit; border-radius: 12px; background: rgba(255,255,255,.02); }
+    .contact-card:hover { border-color: rgba(201,168,76,.4); background: rgba(201,168,76,.05); transform: translateX(4px); }
+    .contact-icon { width: 44px; height: 44px; border: 1px solid rgba(201,168,76,.3); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; transition: all .4s; border-radius: 50%; }
+    .contact-card:hover .contact-icon { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); border-color: transparent; color: #fff; }
+    .contact-card-title { font-size: .6rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: .2rem; }
+    .contact-card-value { font-size: 1rem; color: var(--pearl); font-weight: 400; word-break: break-word; }
+    .contact-card-sub { font-size: .7rem; color: var(--text-muted); margin-top: .1rem; }
+    .map-container { position: relative; overflow: hidden; border: 1px solid rgba(201,168,76,.15); border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+    .map-container iframe { width: 100%; height: 300px; display: block; border: none; filter: grayscale(60%) contrast(1.1) brightness(.9); transition: filter .4s; }
+    .map-container:hover iframe { filter: grayscale(20%) contrast(1.1) brightness(1); }
+    .social-row { display: flex; gap: 0.8rem; margin-top: 2rem; flex-wrap: wrap; }
+    .social-btn { width: 42px; height: 42px; border: 1px solid rgba(201,168,76,.2); display: flex; align-items: center; justify-content: center; font-size: .9rem; color: var(--text-muted); transition: all .3s; text-decoration: none; border-radius: 50%; background: rgba(255,255,255,.02); }
+    .social-btn:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-3px); background: rgba(201,168,76,.08); }
+    .contact-hours { margin-top: 1.5rem; padding: 1.5rem; background: var(--midnight2); border: 1px solid rgba(201,168,76,.1); border-radius: 16px; }
+    .contact-hours-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; margin-top: .4rem; }
+    .contact-hours-grid div { font-size: .8rem; }
+
+    /* footer */
+    footer { background: var(--midnight); padding: 4rem 1.5rem 2rem; border-top: 1px solid rgba(201,168,76,.1); }
+    .footer-grid { display: grid; grid-template-columns: 1fr; gap: 2.5rem; max-width: 1300px; margin: 0 auto; }
+    .footer-brand p { font-size: .75rem; line-height: 1.7; color: var(--text-muted); max-width: 280px; margin-top: .6rem; }
+    .footer-col-title { font-size: .55rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+    .footer-links a { font-size: .75rem; color: var(--text-muted); text-decoration: none; transition: color .3s; }
+    .footer-links a:hover { color: var(--gold-light); }
+    .footer-bottom { max-width: 1300px; margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(201,168,76,.08); display: flex; flex-direction: column; gap: 1rem; align-items: center; }
+    .footer-bottom p { font-size: .6rem; color: var(--text-muted); letter-spacing: .05em; }
+    .footer-awards { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: center; }
+    .footer-award-badge { font-size: .5rem; letter-spacing: .05em; color: var(--gold); border: 1px solid rgba(201,168,76,.3); padding: .2rem .6rem; border-radius: 20px; }
+    .footer-socials { display: flex; gap: 0.8rem; margin-top: 0.8rem; }
+    .footer-socials a { color: var(--text-muted); font-size: .9rem; transition: color .3s; text-decoration: none; }
+
+    /* whatsapp floating */
+    .whatsapp-float {
+      position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+      background: #25D366; color: white; width: 54px; height: 54px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 28px; box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-decoration: none;
+    }
+    .whatsapp-float:hover { transform: scale(1.08); box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6); }
+
+    /* animations */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes tScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    @keyframes scrollLine { 0%{transform:scaleY(0);transform-origin:top} 50%{transform:scaleY(1);transform-origin:top} 51%{transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom} }
+    @keyframes pulse { 0%,100%{opacity:.7} 50%{opacity:1} }
+
+    /* responsive */
+    @media (min-width: 640px) {
+      .gallery-masonry { columns: 3; }
+      .facilities-grid { grid-template-columns: repeat(2,1fr); }
+      .video-grid { grid-template-columns: repeat(2,1fr); }
+      .video-card { max-width: 100%; }
+    }
+    @media (min-width: 768px) {
+      nav { padding: 1.8rem 3rem; }
+      nav.scrolled { padding: 1rem 3rem; }
+      .nav-links { display: flex !important; }
+      .nav-hamburger { display: none; }
+      .about-grid { grid-template-columns: 1fr 1fr; gap: 4rem; }
+      .about-image-stack { min-height: 500px; }
+      .rooms-grid { grid-template-columns: repeat(2,1fr); }
+      .room-featured { grid-column: span 2; }
+      .room-featured .room-img { height: 450px; }
+      .contact-inner { grid-template-columns: 1fr 1fr; gap: 4rem; }
+      .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; }
+      .hero-dots { right: 3rem; }
+      #about, #rooms, #video-section, #facilities, #gallery, #testimonials, #contact { padding: 8rem 3rem; }
+      .section-body { font-size: .9rem; }
+      .review-card { width: 380px; padding: 2rem; }
+    }
+    @media (min-width: 1024px) {
+      .rooms-grid { grid-template-columns: repeat(3,1fr); }
+      .video-grid { grid-template-columns: repeat(3,1fr); }
+      .facilities-grid { grid-template-columns: repeat(4,1fr); }
+      .gallery-masonry { columns: 4; }
+      .hero-title { font-size: clamp(4rem, 7vw, 7rem); }
+    }
+    @media (max-width: 480px) {
+      .hero-title { font-size: 2.4rem; }
+      .hero-actions .btn-primary, .hero-actions .btn-outline { padding: 0.6rem 1.2rem; font-size: 0.6rem; }
+      .room-img { height: 280px; }
+      .room-content { padding: 1rem; }
+      .room-name { font-size: 1.1rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+      .stat-item { padding: 0.6rem; }
+      .stat-num { font-size: 1.5rem; }
+      .contact-hours-grid { grid-template-columns: 1fr; gap: 0.2rem; }
+      .map-container iframe { height: 220px; }
+      .whatsapp-float { width: 48px; height: 48px; font-size: 24px; bottom: 16px; right: 16px; }
+      .hero-dots { bottom: 1.5rem; right: 1rem; }
+      /* loader text centering fix */
+      #loader .loader-logo {
+        font-size: clamp(1.8rem, 8vw, 2.8rem);
+      }
+      .loader-text {
+        font-size: clamp(0.45rem, 2vw, 0.6rem);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADING SCREEN — text perfectly centred on all screens -->
+<div id="loader">
+  <div class="loader-logo">KRISHNA KRIPA</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
+  <div class="loader-text">Preparing your experience</div>
+</div>
+
+<!-- custom cursor (hidden on touch) -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- nav -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">
+    <div class="nav-logo-mark">KR</div>
+    ISHNA KRIPA
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#about">Our Story</a></li>
+    <li><a href="#rooms">Suites</a></li>
+    <li><a href="#video-section">Videos</a></li>
+    <li><a href="#facilities">Amenities</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="https://wa.me/18005550199?text=I'd%20like%20to%20reserve%20a%20suite" class="nav-cta" target="_blank">Reserve Now</a>
+  <div class="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- hero -->
+<section id="hero">
+  <div class="hero-carousel" id="heroCarousel">
+    <div class="hero-slide active"></div>
+    <div class="hero-slide"></div>
+    <div class="hero-slide"></div>
+    <div class="hero-slide"></div>
+  </div>
+  <div class="hero-overlay"></div>
+  <canvas class="hero-particles" id="particleCanvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Est. 1923 · The World's Finest Address</div>
+    <h1 class="hero-title">Where Legends<br>Come to <em>Rest</em></h1>
+    <div class="hero-divider"></div>
+    <div class="hero-subtitle">Suites · Dining · Sanctuary · Legacy</div>
+    <div class="hero-actions">
+      <a href="https://wa.me/18005550199?text=I'd%20like%20to%20reserve%20a%20suite" class="btn-primary" target="_blank">Book via WhatsApp</a>
+      <a href="#about" class="btn-outline">Discover KRISHNA KRIPA</a>
+    </div>
+    <div style="margin-top:1.5rem;font-size:.6rem;letter-spacing:.12em;color:var(--text-muted);opacity:0;animation:fadeUp .8s ease 1.4s forwards;">
+      ✦ Reserve instantly on WhatsApp ✦
+    </div>
+  </div>
+  <div class="hero-scroll" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
+    <span>Scroll to explore</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+  <div class="hero-dots" id="heroDots"></div>
+</section>
+
+<!-- about -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-image-stack reveal">
+      <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80" alt="Hotel exterior" class="about-img-main" onload="this.classList.add('loaded')">
+      <img src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=600&q=80" alt="Suite interior" class="about-img-secondary" onload="this.classList.add('loaded')">
+      <div class="about-badge">
+        <div class="about-badge-num">101</div>
+        <div class="about-badge-label">Years of Excellence</div>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="section-eyebrow">Our Legacy</div>
+      <h2 class="section-title">A Palace<br>Born of <em>Devotion</em></h2>
+      <div class="gold-line"></div>
+      <p class="section-body">KRISHNA KRIPA was conceived in 1923 as a sanctuary for those who refuse to settle for ordinary. From its gilded corridors to its whispering gardens, every detail has been curated over a century of passionate hospitality.</p>
+      <p class="section-body" style="margin-top:1rem">Today, we carry that legacy forward — marrying timeless grandeur with quiet technology and personal touch.</p>
+      <a href="#rooms" class="btn-outline" style="margin-top:2rem;display:inline-block">Explore Our Suites</a>
+      <div class="stats-grid" style="margin-top:2.5rem">
+        <div class="stat-item reveal reveal-delay-1">
+          <div class="stat-num" data-target="147">0</div>
+          <div class="stat-label">Private Suites</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-2">
+          <div class="stat-num" data-target="5">0</div>
+          <div class="stat-label">Star Rating</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-3">
+          <div class="stat-num" data-target="38">0</div>
+          <div class="stat-label">Awards Won</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- rooms -->
+<section id="rooms">
+  <div class="rooms-header reveal">
+    <div>
+      <div class="section-eyebrow">Accommodation</div>
+      <h2 class="section-title">Suites of<br><em>Legend</em></h2>
+    </div>
+    <a href="https://wa.me/18005550199?text=I'd%20like%20to%20reserve%20a%20suite" class="btn-outline" target="_blank">View All Suites</a>
+  </div>
+  <div class="rooms-grid">
+    <div class="room-card room-featured reveal" id="roomCard1">
+      <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80" alt="Imperial Suite" class="room-img">
+      <div class="room-overlay"></div>
+      <div class="room-content">
+        <div class="room-cat">Signature Collection</div>
+        <h3 class="room-name">The Imperial Suite</h3>
+        <p class="room-desc">Three thousand square feet of living legend — original marble, hand-loomed silks, private terrace.</p>
+        <div class="room-price-row">
+          <div><div class="room-price">From $4,800</div><div class="room-price-label">Per night</div></div>
+          <a href="https://wa.me/18005550199?text=I'd%20like%20to%20reserve%20the%20Imperial%20Suite" class="room-btn" target="_blank">Reserve <span>→</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="room-card reveal reveal-delay-1">
+      <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&q=80" alt="Grand Deluxe" class="room-img">
+      <div class="room-overlay"></div>
+      <div class="room-content">
+        <div class="room-cat">Grand Collection</div>
+        <h3 class="room-name">Grand Deluxe Suite</h3>
+        <p class="room-desc">Panoramic views, bespoke furnishings, and a deep-soak tub beneath a gilded skylight.</p>
+        <div class="room-price-row">
+          <div><div class="room-price">From $1,950</div><div class="room-price-label">Per night</div></div>
+          <a href="https://wa.me/18005550199?text=I'd%20like%20to%20reserve%20the%20Grand%20Deluxe" class="room-btn" target="_blank">Reserve <span>→</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="room-card reveal reveal-delay-2">
+      <img src="https://images.unsplash.com/photo-1591088398332-8a7791972843?w=800&q=80" alt="Garden Villa" class="room-img">
+      <div class="room-overlay"></div>
+      <div class="room-content">
+        <div class="room-cat">Retreat Collection</div>
+        <h3 class="room-name">Garden Villa</h3>
+        <p class="room-desc">Your own private garden, plunge pool, and butler — a world entirely unto itself.</p>
+        <div class="room-price-row">
+          <div><div class="room-price">From $2,600</div><div class="room-price-label">Per night</div></div>
+          <a href="https://wa.me/18005550199?text=I'd%20like%20to%20reserve%20the%20Garden%20Villa" class="room-btn" target="_blank">Reserve <span>→</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="room-card reveal reveal-delay-1">
+      <img src="https://images.unsplash.com/photo-1615460549969-36fa19521a4f?w=800&q=80" alt="Heritage" class="room-img">
+      <div class="room-overlay"></div>
+      <div class="room-content">
+        <div class="room-cat">Classic Collection</div>
+        <h3 class="room-name">Heritage Room</h3>
+        <p class="room-desc">The original 1923 proportions, sympathetically restored with modern comfort.</p>
+        <div class="room-price-row">
+          <div><div class="room-price">From $780</div><div class="room-price-label">Per night</div></div>
+          <a href="https://wa.me/18005550199?text=I'd%20like%20to%20reserve%20the%20Heritage%20Room" class="room-btn" target="_blank">Reserve <span>→</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="room-card reveal reveal-delay-2">
+      <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80" alt="Penthouse" class="room-img">
+      <div class="room-overlay"></div>
+      <div class="room-content">
+        <div class="room-cat">Ultimate Collection</div>
+        <h3 class="room-name">The Penthouse</h3>
+        <p class="room-desc">Top floor — private rooftop pool, chef's kitchen, two bedrooms, horizon views.</p>
+        <div class="room-price-row">
+          <div><div class="room-price">From $9,200</div><div class="room-price-label">Per night</div></div>
+          <a href="https://wa.me/18005550199?text=I'd%20like%20to%20reserve%20the%20Penthouse" class="room-btn" target="_blank">Reserve <span>→</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- video section -->
+<section id="video-section">
+  <div class="reveal" style="max-width:1300px;margin:0 auto;padding:0 0.5rem;">
+    <div class="section-eyebrow">Visual Stories</div>
+    <h2 class="section-title">Moments in <em>Motion</em></h2>
+  </div>
+  <div class="video-grid">
+    <div class="video-card reveal">
+      <video src="https://www.w3schools.com/html/mov_bbb.mp4" muted loop playsinline></video>
+      <div class="video-overlay"><span>✦ Arrival at KRISHNA KRIPA</span></div>
+    </div>
+    <div class="video-card reveal reveal-delay-1">
+      <video src="https://www.w3schools.com/html/mov_bbb.mp4" muted loop playsinline></video>
+      <div class="video-overlay"><span>✦ Suite Serenity</span></div>
+    </div>
+    <div class="video-card reveal reveal-delay-2">
+      <video src="https://www.w3schools.com/html/mov_bbb.mp4" muted loop playsinline></video>
+      <div class="video-overlay"><span>✦ Culinary Art</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- facilities -->
+<section id="facilities">
+  <div class="facilities-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Amenities</div>
+      <h2 class="section-title">Every Pleasure,<br><em>Considered</em></h2>
+    </div>
+    <div class="facilities-grid">
+      <div class="facility-card reveal"><span class="facility-icon">🏊</span><div class="facility-name">Infinity Pool</div><p class="facility-desc">50-metre heated pool suspended above the city.</p><div class="facility-tag">6am – 11pm</div></div>
+      <div class="facility-card reveal reveal-delay-1"><span class="facility-icon">💆</span><div class="facility-name">Aurum Spa</div><p class="facility-desc">2,800 sqm of transformation — hammam, cryotherapy.</p><div class="facility-tag">By Appointment</div></div>
+      <div class="facility-card reveal reveal-delay-2"><span class="facility-icon">🏋️</span><div class="facility-name">Performance Studio</div><p class="facility-desc">Technogym, personal trainers, yoga pavilion.</p><div class="facility-tag">24-Hour Access</div></div>
+      <div class="facility-card reveal reveal-delay-3"><span class="facility-icon">🍾</span><div class="facility-name">Champagne Lounge</div><p class="facility-desc">200 prestige cuvées, caviar service.</p><div class="facility-tag">From 5pm</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- gallery -->
+<section id="gallery">
+  <div class="gallery-header reveal">
+    <div class="section-eyebrow">Gallery</div>
+    <h2 class="section-title">Captured in<br><em>Light</em></h2>
+  </div>
+  <div class="gallery-masonry" id="galleryGrid">
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1455587734955-081b22074882?w=600&q=80" alt="Lobby" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1540541338537-25e3f606e9e2?w=600&q=80" alt="Pool" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1563911302283-d2bc129e7570?w=600&q=80" alt="Suite" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?w=600&q=80" alt="Spa" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&q=80" alt="Dining" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=600&q=80" alt="Bar" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1586611292717-f828b167408c?w=600&q=80" alt="Balcony" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1576354302919-96748cb8299e?w=600&q=80" alt="Garden" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=80" alt="Exterior" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=600&q=80" alt="Interior" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=600&q=80" alt="Suite view" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+    <div class="gallery-item" onclick="openLightbox(this)"><img src="https://images.unsplash.com/photo-1591088398332-8a7791972843?w=600&q=80" alt="Villa" loading="lazy"><div class="gallery-item-overlay"><div class="gallery-item-icon">⊕</div></div></div>
+  </div>
+</section>
+
+<!-- lightbox -->
+<div id="lightbox"><button id="lightbox-close" onclick="closeLightbox()">✕</button><img id="lightbox-img" src="" alt=""></div>
+
+<!-- testimonials -->
+<section id="testimonials">
+  <div class="testimonials-header reveal">
+    <div class="section-eyebrow">Guest Stories</div>
+    <h2 class="section-title">Voices of<br><em>Aurum</em></h2>
+  </div>
+  <div class="testimonials-track-wrap">
+    <div class="testimonials-track" id="testimonialTrack">
+      <div class="review-card"><div class="review-stars"><span>★★★★★</span></div><p class="review-text">"Aurum does not merely accommodate — it transforms. We arrived as guests and departed as devotees."</p><div class="review-author"><div class="review-avatar">VC</div><div><div class="review-name">Victoria Chambers</div><div class="review-from">London · Imperial Suite</div></div></div></div>
+      <div class="review-card"><div class="review-stars"><span>★★★★★</span></div><p class="review-text">"The Ambrosia tasting menu was the finest meal of my life. Rousseau is a sorcerer."</p><div class="review-author"><div class="review-avatar">DM</div><div><div class="review-name">David Marchetti</div><div class="review-from">Milan · Grand Deluxe</div></div></div></div>
+      <div class="review-card"><div class="review-stars"><span>★★★★★</span></div><p class="review-text">"My husband proposed in the Garden Villa. Aurum's team turned it into a memory we will carry forever."</p><div class="review-author"><div class="review-avatar">NA</div><div><div class="review-name">Natasha Al-Rashid</div><div class="review-from">Dubai · Garden Villa</div></div></div></div>
+      <div class="review-card"><div class="review-stars"><span>★★★★★</span></div><p class="review-text">"The spa alone justifies the journey. Two hours in the Aqua Thermal Circuit and I aged backwards."</p><div class="review-author"><div class="review-avatar">HK</div><div><div class="review-name">Haruto Kobayashi</div><div class="review-from">Tokyo · Heritage Room</div></div></div></div>
+      <div class="review-card"><div class="review-stars"><span>★★★★★</span></div><p class="review-text">"Our tenth anniversary at Aurum. Every year, somehow, they surpass themselves."</p><div class="review-author"><div class="review-avatar">SC</div><div><div class="review-name">Sophie & Charles</div><div class="review-from">Paris · Penthouse</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- contact -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Contact</div>
+      <h2 class="section-title">We Are<br><em>Listening</em></h2>
+      <div class="gold-line"></div>
+      <p class="section-body" style="font-size:0.95rem;max-width:580px;">Our concierge team is available around the clock — by phone, message, or in person. No request too large, no detail too small.</p>
+      <div class="contact-info-grid">
+        <a class="contact-card" href="tel:+18005550199" style="text-decoration:none;color:inherit;">
+          <div class="contact-icon">📞</div>
+          <div><div class="contact-card-title">Telephone</div><div class="contact-card-value">04872081551</div><div class="contact-card-sub">24/7</div></div>
+        </a>
+        <a class="contact-card" href="https://wa.me/9526466777" target="_blank" style="text-decoration:none;color:inherit;">
+          <div class="contact-icon">💬</div>
+          <div><div class="contact-card-title">WhatsApp</div><div class="contact-card-value">Message Us Now</div><div class="contact-card-sub">Response under 5 min</div></div>
+        </a>
+        <a class="contact-card" href="mailto:residency.krishnakripa@gmail.com" style="text-decoration:none;color:inherit;">
+          <div class="contact-icon">✉️</div>
+          <div><div class="contact-card-title">Email</div><div class="contact-card-value">residency.krishnakripa@gmail.com</div><div class="contact-card-sub">Response within 2 hours</div></div>
+        </a>
+        <div class="contact-card">
+          <div class="contact-icon">📍</div>
+          <div><div class="contact-card-title">Address</div><div class="contact-card-value">Near Village Office</div><div class="contact-card-sub">West Nada,Guruvayoor,Thrissur,Kerala,680103</div></div>
+        </div>
+      </div>
+      <div class="social-row">
+        <a class="social-btn" aria-label="Instagram">𝐈𝐆</a>
+        <a class="social-btn" aria-label="Facebook">𝐅</a>
+        <a class="social-btn" aria-label="Twitter">𝕏</a>
+        <a class="social-btn" aria-label="LinkedIn">𝐢𝐧</a>
+        <a class="social-btn" aria-label="YouTube">▶</a>
+        <a class="social-btn" aria-label="Pinterest">𝐏</a>
+        <a class="social-btn" aria-label="TikTok">♪</a>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1960.8980059796363!2d76.03848303853707!3d10.595115947385729!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba7948afa6aecf5%3A0xd15e104109e1270d!2sKrishnakripa%20Residency!5e0!3m2!1sen!2sin!4v1782407471884!5m2!1sen!2sin" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Aurum Palace location" allowfullscreen></iframe>
+      </div>
+      <div class="contact-hours">
+        <div style="font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:0.8rem;">Concierge Hours</div>
+        <div class="contact-hours-grid">
+          <div style="color:var(--text-muted);">Reservations</div><div style="color:var(--pearl);">24/7 · All languages</div>
+          <div style="color:var(--text-muted);">Ambrosia</div><div style="color:var(--pearl);">12pm–2:30pm · 7pm–11pm</div>
+          <div style="color:var(--text-muted);">Spa</div><div style="color:var(--pearl);">8am–10pm daily</div>
+          <div style="color:var(--text-muted);">Pool & Fitness</div><div style="color:var(--pearl);">6am–11pm daily</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- footer -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#hero" class="nav-logo"><div class="nav-logo-mark">AP</div>Aurum Palace</a>
+      <p>A sanctuary of timeless luxury since 1923. The world's most storied address, reimagined for each new generation.</p>
+      <div style="margin-top:1rem;font-size:.55rem;color:var(--text-muted);">1 Aurum Boulevard · The Golden Quarter</div>
+      <div class="footer-socials">
+        <a href="#" aria-label="Instagram">𝐈𝐆</a>
+        <a href="#" aria-label="Facebook">𝐅</a>
+        <a href="#" aria-label="Twitter">𝕏</a>
+        <a href="#" aria-label="LinkedIn">𝐢𝐧</a>
+        <a href="#" aria-label="YouTube">▶</a>
+        <a href="#" aria-label="Pinterest">𝐏</a>
+      </div>
+    </div>
+    <div><div class="footer-col-title">The Hotel</div><ul class="footer-links"><li><a href="#about">Our Story</a></li><li><a href="#rooms">Suites & Villas</a></li><li><a href="#video-section">Videos</a></li><li><a href="#facilities">Spa & Wellness</a></li><li><a href="#gallery">Gallery</a></li></ul></div>
+    <div><div class="footer-col-title">Experiences</div><ul class="footer-links"><li><a href="#facilities">Weddings & Events</a></li><li><a href="#facilities">Meetings</a></li><li><a href="#facilities">Helicopter Transfers</a></li><li><a href="#facilities">Private Dining</a></li><li><a href="#facilities">Concierge</a></li></ul></div>
+    <div><div class="footer-col-title">Information</div><ul class="footer-links"><li><a href="#contact">Contact</a></li><li><a href="https://wa.me/18005550199" target="_blank">Reservations</a></li><li><a href="#">Press</a></li><li><a href="#">Careers</a></li><li><a href="#">Privacy</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><p>© 2024 Aurum Palace. All rights reserved.</p><div class="footer-awards"><span class="footer-award-badge">Forbes 5★</span><span class="footer-award-badge">Michelin 3★</span><span class="footer-award-badge">Travel + Leisure #1</span></div></div>
+</footer>
+
+<!-- WhatsApp floating -->
+<a href="https://wa.me/18005550199?text=I'd%20like%20to%20reserve%20a%20suite" class="whatsapp-float" target="_blank" aria-label="WhatsApp">💬</a>
+
+<script>
+  (function(){
+    "use strict";
+
+    // LOADER
+    const loaderBar = document.getElementById('loader-bar');
+    const loader = document.getElementById('loader');
+    let p = 0;
+    const li = setInterval(function(){
+      p += Math.random()*15 + 5;
+      if(p >= 100){ p = 100; clearInterval(li); setTimeout(function(){ loader.classList.add('hidden'); initAll(); }, 400); }
+      loaderBar.style.width = Math.min(p,100) + '%';
+    }, 150);
+
+    function initAll(){
+      initCursor();
+      initNav();
+      initHero();
+      initParticles();
+      initReveal();
+      initCounters();
+      initRoomTilt();
+      initVideos();
+    }
+
+    // CURSOR (only on hover-capable devices)
+    function initCursor(){
+      const cur = document.getElementById('cursor');
+      const ring = document.getElementById('cursor-ring');
+      if (!cur || !ring) return;
+      let mx=0,my=0,rx=0,ry=0;
+      document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; });
+      function animRing(){ rx += (mx-rx)*0.12; ry += (my-ry)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); }
+      animRing();
+      document.querySelectorAll('a,button,.room-card,.facility-card,.gallery-item,.contact-card,.social-btn').forEach(el => {
+        el.addEventListener('mouseenter', ()=>{ cur.style.width='20px'; cur.style.height='20px'; ring.style.width='60px'; ring.style.height='60px'; ring.style.borderColor='rgba(201,168,76,.8)'; });
+        el.addEventListener('mouseleave', ()=>{ cur.style.width='12px'; cur.style.height='12px'; ring.style.width='40px'; ring.style.height='40px'; ring.style.borderColor='rgba(201,168,76,.5)'; });
+      });
+    }
+
+    // NAV
+    function initNav(){
+      const nav = document.getElementById('nav');
+      window.addEventListener('scroll', ()=>{ nav.classList.toggle('scrolled', window.scrollY>80); });
+    }
+    window.toggleMobileMenu = function(){
+      const links = document.getElementById('navLinks');
+      if(links.style.display === 'flex'){ links.style.display = ''; return; }
+      links.style.display = 'flex';
+      links.style.flexDirection = 'column';
+      links.style.position = 'fixed';
+      links.style.top = '70px'; links.style.left = '0'; links.style.right = '0';
+      links.style.background = 'rgba(10,10,15,.97)';
+      links.style.padding = '2rem'; links.style.gap = '1.2rem';
+      links.style.backdropFilter = 'blur(20px)';
+      links.style.zIndex = '8000';
+      links.style.borderTop = '1px solid rgba(201,168,76,.1)';
+      links.style.alignItems = 'center';
+    };
+
+    // HERO CAROUSEL
+    function initHero(){
+      const slides = document.querySelectorAll('.hero-slide');
+      const dotsEl = document.getElementById('heroDots');
+      let current = 0;
+      slides.forEach((_,i)=>{ const d=document.createElement('div'); d.className='hero-dot'+(i===0?' active':''); d.onclick=()=>goSlide(i); dotsEl.appendChild(d); });
+      function goSlide(n){ slides[current].classList.remove('active'); dotsEl.children[current].classList.remove('active'); current=n; slides[current].classList.add('active'); dotsEl.children[current].classList.add('active'); }
+      setInterval(()=>{ goSlide((current+1)%slides.length); }, 5000);
+    }
+
+    // PARTICLES
+    function initParticles(){
+      const canvas = document.getElementById('particleCanvas');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+      function spawn(){ particles.push({ x:Math.random()*canvas.width, y:canvas.height+10, r:Math.random()*2+0.5, speed:Math.random()*0.4+0.1, life:0, maxLife:Math.random()*200+100, drift:(Math.random()-0.5)*0.3 }); }
+      function tick(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        if(Math.random()<0.15) spawn();
+        particles = particles.filter(p => p.life < p.maxLife);
+        particles.forEach(p => {
+          const alpha = Math.sin((p.life/p.maxLife)*Math.PI)*0.4;
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(201,168,76,'+alpha+')'; ctx.fill();
+          p.x+=p.drift; p.y-=p.speed; p.life++;
+        });
+        requestAnimationFrame(tick);
+      }
+      tick();
+    }
+
+    // REVEAL
+    function initReveal(){
+      const els = document.querySelectorAll('.reveal');
+      function check(){ els.forEach(el => { if(el.getBoundingClientRect().top < window.innerHeight-80) el.classList.add('visible'); }); }
+      window.addEventListener('scroll', check, {passive:true});
+      check();
+    }
+
+    // COUNTERS
+    function initCounters(){
+      const nums = document.querySelectorAll('[data-target]');
+      const animated = new Set();
+      function check(){
+        nums.forEach(el => {
+          if(animated.has(el)) return;
+          if(el.getBoundingClientRect().top < window.innerHeight-60){
+            animated.add(el);
+            const target = +el.getAttribute('data-target');
+            const dur = 1800;
+            const startTime = performance.now();
+            function step(ts){
+              const progress = Math.min((ts-startTime)/dur,1);
+              const ease = 1-Math.pow(1-progress,3);
+              el.textContent = Math.floor(ease*target)+(target>10?'+':'');
+              if(progress<1) requestAnimationFrame(step);
+              else el.textContent = target+(target>3?'+':'');
+            }
+            requestAnimationFrame(step);
+          }
+        });
+      }
+      window.addEventListener('scroll', check, {passive:true});
+      check();
+    }
+
+    // ROOM TILT
+    function initRoomTilt(){
+      document.querySelectorAll('.room-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = (e.clientX - rect.left)/rect.width - .5;
+          const y = (e.clientY - rect.top)/rect.height - .5;
+          card.style.transform = `perspective(800px) rotateY(${x*4}deg) rotateX(${-y*4}deg) translateZ(5px)`;
+        });
+        card.addEventListener('mouseleave', ()=>{ card.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) translateZ(0)'; });
+      });
+    }
+
+    // VIDEO AUTOPLAY
+    function initVideos(){
+      document.querySelectorAll('.video-card video').forEach(vid => {
+        vid.addEventListener('mouseenter', ()=>{ vid.play(); });
+        vid.addEventListener('mouseleave', ()=>{ vid.pause(); vid.currentTime = 0; });
+      });
+    }
+
+    // LIGHTBOX
+    window.openLightbox = function(item){
+      const img = item.querySelector('img');
+      document.getElementById('lightbox-img').src = img.src;
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+    window.closeLightbox = function(){
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    };
+    document.getElementById('lightbox').addEventListener('click', function(e){ if(e.target===this) closeLightbox(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeLightbox(); });
+
+    // SMOOTH ANCHOR SCROLL
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', function(e){
+        const target = document.querySelector(this.getAttribute('href'));
+        if(target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); }
+        const links = document.getElementById('navLinks');
+        if(links.style.display === 'flex') links.style.display = '';
+      });
+    });
+  })();
+</script>
+</body>
+</html>
